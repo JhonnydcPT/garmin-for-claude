@@ -20,7 +20,7 @@ It works from your phone and with your computer off. It is read-only: it never c
 
 ## Step 2 · Put your connector online (3 minutes)
 
-1. Click the blue **Deploy to Cloudflare** button above.
+1. Click the orange **Deploy to Cloudflare** button above.
 2. Sign in to Cloudflare, or create a free account.
 3. When it asks for the secrets, fill in the two fields:
    - **GARMIN_API_KEY** → paste the key from step 1;
