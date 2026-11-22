@@ -1,0 +1,4 @@
+# Your Personal API key from Garmin Connect (Settings > Personal API)
+GARMIN_API_KEY=
+# A secret code you choose: at least 12 characters, no spaces. It is part of the URL you give to Claude.
+ACCESS_CODE=
