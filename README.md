@@ -9,6 +9,20 @@ It works from your phone and with your computer off. It is read-only: it never c
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/JhonnydcPT/garmin-for-claude)
 
 ---
+## What you need
+
+- **A Garmin Connect account** (free) with a Garmin watch or device.
+- **A GitHub account** (free): the Deploy button creates your own copy of this project there.
+- **A Cloudflare account** (free).
+- **Claude**, even the free plan (it allows 1 custom connector).
+- **A computer** for the setup (creating the Garmin key and deploying). After that, it also works from your phone.
+
+Everyone gets their own separate copy, with their own key, and sees only their own data.
+
+**Limits**
+- Personal use only: Garmin's terms don't allow using your key to serve other people.
+- Garmin China accounts use a different server and are not supported yet.
+- The Garmin key expires after 1 year at most and must be renewed.
 
 ## Step 1 · Create your Garmin key (2 minutes)
 
