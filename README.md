@@ -28,7 +28,7 @@ It works from your phone and with your computer off. It is read-only: it never c
 4. Click **Deploy** and wait until it finishes.
 5. Check that it works: open in your browser
    `https://garmin-for-claude.<your-subdomain>.workers.dev/test/<your-ACCESS_CODE>`
-   If you see **✅ Everything works**, you are done. You can find the exact URL of your connector on Cloudflare, on the page of the Worker you just created.
+   If you see **✅ Everything works**, step 2 is done. You can find the exact URL of your connector on Cloudflare, on the page of the Worker you just created.
 
 <details>
 <summary>Cloudflare did not ask me for the secrets</summary>
@@ -40,9 +40,20 @@ On Cloudflare open **Workers & Pages → garmin-for-claude → Settings → Vari
 
 1. On **claude.ai** open **Settings → Connectors → Add custom connector**.
 2. Name: `Garmin`. URL:
-   `https://garmin-for-claude.<your-subdomain>.workers.dev/mcp/<your-ACCESS_CODE>`
-3. If it asks about authentication, choose **No sign in**: the protection is the secret code inside the URL.
-4. Click **Add**. The connector also works in the Claude app on your phone.
+   `https://garmin-for-claude.<your-subdomain>.workers.dev/mcp`
+3. Authentication: choose **No sign in**.
+4. Under **Request headers** add one header:
+   - name: `X-Access-Code`
+   - value: your `ACCESS_CODE`
+5. Click **Add**. The connector also works in the Claude app on your phone.
+
+Your secret code travels in the header, not in the URL, so the URL is safe to show (for example in a video).
+
+<details>
+<summary>My Claude has no "Request headers" field</summary>
+
+Put the code at the end of the URL instead: `https://garmin-for-claude.<your-subdomain>.workers.dev/mcp/<your-ACCESS_CODE>`. In this case the URL itself is secret: don't share it.
+</details>
 
 Now ask Claude, for example:
 
@@ -70,7 +81,7 @@ Now ask Claude, for example:
 
 - **Training Readiness, Training Status and VO2max are not available:** Garmin's Personal API does not provide them.
 - **The Garmin key expires** (after 1 year at most), and Garmin emails you about a week before. When it happens, create a new one (step 1) and replace it on Cloudflare in Settings → Variables and Secrets.
-- **The URL with your ACCESS_CODE works like a password:** anyone who has it can read your Garmin data, so don't share it. If you think someone knows it, change `ACCESS_CODE` on Cloudflare and update the URL in Claude.
+- **Your ACCESS_CODE works like a password:** anyone who has it can read your Garmin data, so don't share it. If you think someone knows it, change `ACCESS_CODE` on Cloudflare and update it in Claude.
 - **The connector is yours only.** The Garmin key is for personal use: everyone must deploy their own copy with their own key.
 - **This is a free personal project**, not official and not affiliated with Garmin or Anthropic.
 

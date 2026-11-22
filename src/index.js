@@ -7,7 +7,7 @@
 
 const GARMIN = "https://personal.connectapi.garmin.com";
 const TOKEN_PATH = "/personalapitoken-service/personal-api/personal-api-key/token";
-const SERVER_INFO = { name: "garmin-for-claude", version: "1.0.0" };
+const SERVER_INFO = { name: "garmin-for-claude", version: "1.1.0" };
 const MAX_CHARS = 60000;
 
 // ---------------------------------------------------------------- Garmin token
@@ -245,16 +245,19 @@ const html = (body, status = 200) =>
     { status, headers: { "content-type": "text/html; charset=utf-8" } }
   );
 
+const connectHelp = (origin) =>
+  `<h2>Connect it to Claude</h2><p>In Claude: <b>Settings → Connectors → Add custom connector</b>.</p><ul><li><b>URL:</b> <code>${origin}/mcp</code></li><li><b>Authentication:</b> No sign in</li><li><b>Request headers:</b> name <code>X-Access-Code</code>, value = your ACCESS_CODE</li></ul>`;
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const parts = url.pathname.split("/").filter(Boolean); // ["mcp", "<code>"]
+    const parts = url.pathname.split("/").filter(Boolean); // ["test", "<code>"] or ["mcp"]
 
     if (parts.length === 0) {
       const ready = Boolean(env.GARMIN_API_KEY && env.ACCESS_CODE);
       return html(
         ready
-          ? `<h1>✅ Garmin for Claude is running</h1><p>To check your Garmin key open:<br><code>${url.origin}/test/YOUR-ACCESS-CODE</code></p><p>The URL to paste into Claude is:<br><code>${url.origin}/mcp/YOUR-ACCESS-CODE</code></p>`
+          ? `<h1>✅ Garmin for Claude is running</h1><p>To check your Garmin key open:<br><code>${url.origin}/test/YOUR-ACCESS-CODE</code></p>${connectHelp(url.origin)}`
           : `<h1>⚠️ Setup missing</h1><p>On Cloudflare add the secrets <code>GARMIN_API_KEY</code> and <code>ACCESS_CODE</code>.</p>`
       );
     }
@@ -262,22 +265,31 @@ export default {
     if (!env.ACCESS_CODE || String(env.ACCESS_CODE).length < 8) {
       return html("<h1>⚠️ ACCESS_CODE is missing or too short (at least 8 characters)</h1>", 500);
     }
-    if (parts.length !== 2 || !["mcp", "test"].includes(parts[0]) || !sameCode(parts[1], String(env.ACCESS_CODE))) {
+    const code = String(env.ACCESS_CODE);
+    const isTest = parts[0] === "test" && parts.length === 2 && sameCode(parts[1], code);
+    // MCP: code in a request header (recommended) or, for older setups, in the URL.
+    const headerCode =
+      request.headers.get("x-access-code") ||
+      (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+    const isMcp =
+      parts[0] === "mcp" &&
+      ((parts.length === 1 && sameCode(headerCode.trim(), code)) || (parts.length === 2 && sameCode(parts[1], code)));
+    if (!isTest && !isMcp) {
       return new Response("Not found", { status: 404 });
     }
 
-    if (parts[0] === "test") {
+    if (isTest) {
       try {
         await getToken(env, true);
         const list = JSON.parse(await garminGet(env, "/activitylist-service/activities/search/activities?start=0&limit=1"));
         const last = Array.isArray(list) && list[0] ? `Latest activity: <b>${list[0].activityName || "untitled"}</b> on ${String(list[0].startTimeLocal || "").slice(0, 10)}.` : "";
-        return html(`<h1>✅ Everything works</h1><p>Your Garmin key is valid. ${last}</p><p>Now paste this URL into Claude:<br><code>${url.origin}/mcp/${parts[1]}</code></p>`);
+        return html(`<h1>✅ Everything works</h1><p>Your Garmin key is valid. ${last}</p>${connectHelp(url.origin)}`);
       } catch (x) {
         return html(`<h1>❌ Something is wrong</h1><p>${String(x.message || x)}</p>`, 502);
       }
     }
 
-    // /mcp/<code>
+    // MCP endpoint
     if (request.method === "GET") return new Response("Use POST (MCP Streamable HTTP).", { status: 405, headers: { Allow: "POST" } });
     if (request.method === "DELETE") return new Response(null, { status: 204 });
     if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "POST" } });
