@@ -39,20 +39,17 @@ On Cloudflare open **Workers & Pages → garmin-for-claude → Settings → Vari
 ## Step 3 · Connect it to Claude (1 minute)
 
 1. On **claude.ai** open **Settings → Connectors → Add custom connector**.
-2. Name: `Garmin`. URL:
-   `https://garmin-for-claude.<your-subdomain>.workers.dev/mcp`
-3. Authentication: choose **No sign in**.
-4. Under **Request headers** add one header:
-   - name: `X-Access-Code`
-   - value: your `ACCESS_CODE`
-5. Click **Add**. The connector also works in the Claude app on your phone.
+2. Name: `Garmin`. URL (your secret code goes at the end):
+   `https://garmin-for-claude.<your-subdomain>.workers.dev/mcp/<your-ACCESS_CODE>`
+3. Authentication: choose **No sign in**. Leave request headers empty.
+4. Click **Add**. The connector also works in the Claude app on your phone.
 
-Your secret code travels in the header, not in the URL, so the URL is safe to show (for example in a video).
+> This URL contains your secret code: don't share it, and blur it if you record your screen.
 
 <details>
-<summary>My Claude has no "Request headers" field</summary>
+<summary>Using another MCP client that lets you set headers?</summary>
 
-Put the code at the end of the URL instead: `https://garmin-for-claude.<your-subdomain>.workers.dev/mcp/<your-ACCESS_CODE>`. In this case the URL itself is secret: don't share it.
+You can keep the code out of the URL: use `https://garmin-for-claude.<your-subdomain>.workers.dev/mcp` and send the header `Authorization: Bearer <your-ACCESS_CODE>` (or `X-Access-Code: <your-ACCESS_CODE>`).
 </details>
 
 Now ask Claude, for example:
