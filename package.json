@@ -1,0 +1,16 @@
+{
+  "name": "garmin-for-claude",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Connect your Garmin data to Claude in 3 steps (Garmin Connect Personal API, read-only).",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "node test/run.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.166.0"
+  },
+  "license": "MIT"
+}
